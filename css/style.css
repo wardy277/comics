@@ -1,0 +1,13 @@
+
+body {
+    /*grey is #F7F7F7 */
+    padding-top: 70px;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
