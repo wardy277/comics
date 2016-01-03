@@ -3,33 +3,30 @@ $volume = $_GET['volume'];
 
 $comicvine = new ComicVine();
 
-$results = $comicvine->listIssues($volume);
+$results     = $comicvine->listIssues($volume);
 $result_html = array();
 
 foreach($results as $result){
 	$api_detail_url = $result['api_detail_url'];
-	$issue_id = explode('/', $api_detail_url);
-	$issue_id = $issue_id[count($issue_id)-2];
+	$issue_id       = explode('/', $api_detail_url);
+	$issue_id       = $issue_id[ count($issue_id) - 2 ];
 
 	$url = "/issue.php?issue_id=".$issue_id;
-
-
-
 
 	//build title
 	$title = "#".$result['issue_number']." ".$result['name']." (".$result['id'].")";
 
-	if($i++ > 3){
-		//get issue data
-		$issue = $comicvine->getIssue($issue_id);
-		//get review score
-		$review = $issue['has_staff_review']['site_detail_url'];
-		if($review){
-			$score = $comicvine->getIssueReview($review);
+	/* too heavy
+	//get issue data
+	$issue = $comicvine->getIssue($issue_id);
+	//get review score
+	$review = $issue['has_staff_review']['site_detail_url'];
+	if($review){
+		$score = $comicvine->getIssueReview($review);
 
-			$title .= "<span class='right'>$score</span>";
-		}
+		$title .= "<span class='right'>score: $score</span>";
 	}
+	*/
 
 	//build content
 	$content = "<div class='row'>
