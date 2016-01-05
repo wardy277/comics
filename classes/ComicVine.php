@@ -98,7 +98,7 @@ class ComicVine extends Entity{
 	}
 
 
-	public function searchVolumes($search){
+	public function searchVolumes($search, $store=false){
 		global $db;
 
 		//human readable url encoded string
@@ -113,17 +113,19 @@ class ComicVine extends Entity{
 		$data = $this->queryArray('search', $query);
 
 		//store volumes in database
-		foreach($data['results'] as $result){
-			$result['comicvine_id'] = $result['id'];
-			$result['thumb_url'] = $result['image']['thumb_url'];
-			unset($result['id']);
-			$db->insert('volumes', $result, true);
+		if($store){
+			foreach($data['results'] as $result){
+				$result['comicvine_id'] = $result['id'];
+				$result['thumb_url']    = $result['image']['thumb_url'];
+				unset($result['id']);
+				$db->insert('volumes', $result, true);
+			}
 		}
 
 		return $data['results'];
 	}
 
-	public function listIssues($volume_id){
+	public function listIssues($volume_id, $store=false){
 		global $db;
 
 		$filter = array(
@@ -134,19 +136,21 @@ class ComicVine extends Entity{
 		$data = $this->queryArray('issues', false, $filter);
 
 		//store volumes in database
-		foreach($data['results'] as $result){
-			$api_detail_url = $result['api_detail_url'];
+		if($store){
+			foreach($data['results'] as $result){
+				$api_detail_url = $result['api_detail_url'];
 
-			//comicvine id is preceded by a reference id of some sort
-			$issue_id       = explode('/', $api_detail_url);
-			$issue_id       = $issue_id[ count($issue_id) - 2 ];
+				//comicvine id is preceded by a reference id of some sort
+				$issue_id = explode('/', $api_detail_url);
+				$issue_id = $issue_id[ count($issue_id) - 2 ];
 
-			$result['comicvine_id'] = $issue_id;
-			$result['volume_id'] = $volume_id;
-			$result['thumb_url'] = $result['image']['thumb_url'];
-			unset($result['id']);
+				$result['comicvine_id'] = $issue_id;
+				$result['volume_id']    = $volume_id;
+				$result['thumb_url']    = $result['image']['thumb_url'];
+				unset($result['id']);
 
-			$db->insert('issues', $result, true);
+				$db->insert('issues', $result, true);
+			}
 		}
 
 		return $data['results'];

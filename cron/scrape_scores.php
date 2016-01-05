@@ -9,7 +9,7 @@ $sql = "SELECT v.name, i.id, i.issue_number, i.site_detail_url
 			FROM volumes v
 			JOIN issues i ON i.volume_id = v.comicvine_id
 			WHERE score IS NULL
-			ORDER BY i.date_last_updated";
+			ORDER BY i.date_last_updated DESC";
 
 foreach($db->getArray($sql) as $row){
 	echo "\n{$row['name']} - {$row['issue_number']}' ";
@@ -26,11 +26,13 @@ foreach($db->getArray($sql) as $row){
 		$review_score = -1;
 	}
 
+	echo "score: ".$review_score;
+
 	$db->update('issues', array('score'=>$review_score),  array('id'=>$row['id']));
 	//exit;
 
 	//dangerous as can get blacked. try and pretend to be a human
-	echo " ".(rand(50, 300)/100);
+	echo " ".(rand(300, 1000)/100);
 }
 
 //done - be nice to a terminal
