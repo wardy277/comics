@@ -58,7 +58,28 @@ class ComicVine extends Entity{
 
 		echo $url;
 
-		$file_contents = file_get_contents($url);
+		//$file_contents = tor_get_contents($url);
+		$enable_cache  = true;
+
+		if($enable_cache){
+			//cache url
+			$cache = "/tmp/".urlencode($url);
+			if(!file_exists($cache)){
+				echo "rebuilding ache";
+				$file_contents = file_get_contents($url);
+
+				if(!$file_contents){
+					echo "<h1>Temorarily blocked</h1>";
+
+					return false;
+				}
+
+				file_put_contents($cache, $file_contents);
+			}
+
+			$file_contents = file_get_contents($cache);
+		}
+
 
 		if(!$file_contents){
 			return false;
@@ -78,6 +99,8 @@ class ComicVine extends Entity{
 
 
 	public function searchVolumes($search){
+		global $db;
+
 		//human readable url encoded string
 		$search = str_replace(" ", "+", $search);
 
@@ -89,16 +112,42 @@ class ComicVine extends Entity{
 		//get as json
 		$data = $this->queryArray('search', $query);
 
+		//store volumes in database
+		foreach($data['results'] as $result){
+			$result['comicvine_id'] = $result['id'];
+			$result['thumb_url'] = $result['image']['thumb_url'];
+			unset($result['id']);
+			$db->insert('volumes', $result, true);
+		}
+
 		return $data['results'];
 	}
 
 	public function listIssues($volume_id){
+		global $db;
+
 		$filter = array(
 			'volume' => $volume_id,
 		);
 
 		//get as json
 		$data = $this->queryArray('issues', false, $filter);
+
+		//store volumes in database
+		foreach($data['results'] as $result){
+			$api_detail_url = $result['api_detail_url'];
+
+			//comicvine id is preceded by a reference id of some sort
+			$issue_id       = explode('/', $api_detail_url);
+			$issue_id       = $issue_id[ count($issue_id) - 2 ];
+
+			$result['comicvine_id'] = $issue_id;
+			$result['volume_id'] = $volume_id;
+			$result['thumb_url'] = $result['image']['thumb_url'];
+			unset($result['id']);
+
+			$db->insert('issues', $result, true);
+		}
 
 		return $data['results'];
 	}
