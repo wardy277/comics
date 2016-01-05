@@ -59,7 +59,7 @@ class ComicVine extends Entity{
 		echo $url;
 
 		//$file_contents = tor_get_contents($url);
-		$enable_cache  = true;
+		$enable_cache = true;
 
 		if($enable_cache){
 			//cache url
@@ -98,7 +98,7 @@ class ComicVine extends Entity{
 	}
 
 
-	public function searchVolumes($search, $store=false){
+	public function searchVolumes($search){
 		global $db;
 
 		//human readable url encoded string
@@ -113,19 +113,17 @@ class ComicVine extends Entity{
 		$data = $this->queryArray('search', $query);
 
 		//store volumes in database
-		if($store){
-			foreach($data['results'] as $result){
-				$result['comicvine_id'] = $result['id'];
-				$result['thumb_url']    = $result['image']['thumb_url'];
-				unset($result['id']);
-				$db->insert('volumes', $result, true);
-			}
+		foreach($data['results'] as $result){
+			$result['comicvine_id'] = $result['id'];
+			$result['thumb_url']    = $result['image']['thumb_url'];
+			unset($result['id']);
+			$db->insert('volumes', $result, true);
 		}
 
 		return $data['results'];
 	}
 
-	public function listIssues($volume_id, $store=false){
+	public function listIssues($volume_id, $store = false){
 		global $db;
 
 		$filter = array(

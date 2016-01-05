@@ -3,7 +3,9 @@ $volume = $_GET['volume'];
 
 $comicvine = new ComicVine();
 
-$results     = $comicvine->listIssues($volume);
+$store = $_GET['store']?true:false;
+
+$results     = $comicvine->listIssues($volume, $store);
 $result_html = array();
 
 foreach($results as $result){

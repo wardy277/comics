@@ -13,7 +13,7 @@ foreach(file($filename) as $comic){
 	}
 
 	//search for comics on list
-	$results = $comicvine->searchVolumes($comic, true);
+	$results = $comicvine->searchVolumes($comic);
 	$result_html = array();
 
 	$found = false;
